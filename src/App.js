@@ -14,7 +14,7 @@ export class App extends Component{
   }
   responseGoogle=(response)=>{
     //console.log(response);
-    console.log(response.profileObj.email);
+    //console.log(response.profileObj.email);
     if (response.profileObj.email === "kennyyuen1988@gmail.com"){
       this.setState({
         loginStatus:"success",
