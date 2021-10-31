@@ -2,7 +2,8 @@
 //import './App.css';
 import React, { Component } from 'react';
 import GoogleLogin from 'react-google-login';
-
+import { Upload } from "@aws-sdk/lib-storage";
+import { S3Client, S3 } from "@aws-sdk/client-s3";
 
 export class App extends Component{
   constructor(props){
@@ -27,13 +28,35 @@ export class App extends Component{
   }
   render(){
     if(this.state.loginStatus==="success"){
+      const upload = (file) =>{
+        var uploadFile = file.target.files[0];
+
+        const target = { Bucket:"kennyuploadbucket", Key:uploadFile.name, Body:uploadFile };
+        const creds = {accessKeyId:"AKIA6QNEXQQR35TZXHEZ"};
+        try {
+          const parallelUploads3 = new Upload({
+            client: new S3Client({region:"ap-east-1", credentials:creds}),
+            //tags: [...], // optional tags
+            //queueSize: 4, // optional concurrency configuration
+            //partSize: 5MB, // optional size of each part
+            leavePartsOnError: false, // optional manually handle dropped parts
+            params: target,
+          });
+
+          parallelUploads3.on("httpUploadProgress", (progress) => {
+            console.log(progress);
+          });
+
+          parallelUploads3.done();
+        } catch (e) {
+          console.log(e);
+        }
+
+      }
       return (
-        <div>
-          <form action="/action_page.php">
-            <input type="file" id="myFile" name="filename" />
-            <input type="submit" />
-          </form>
-        </div>
+        <>
+          <input type="file" onChange={upload}/>
+        </>
       );
     }
     else if (this.state.loginStatus==="fail") {
